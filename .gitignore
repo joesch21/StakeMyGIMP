@@ -1,0 +1,57 @@
+# Node modules
+node_modules/
+.pnp/
+.pnp.js
+
+# Yarn
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+
+# Testing and coverage
+coverage/
+
+# Next.js build output and related files
+.next/
+out/
+build/
+.next/cache/
+
+# Production build files
+dist/
+
+# Miscellaneous system and IDE files
+.DS_Store
+Thumbs.db
+*.pem
+.vscode/
+.idea/
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment variables (do not upload these!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel deployment files
+.vercel
+
+# Typescript-specific
+*.tsbuildinfo
+next-env.d.ts
+
+# Static exports
+export/
+
+# Ignore temporary files created by editors or OS
+*.swp
+*.swo
+*~

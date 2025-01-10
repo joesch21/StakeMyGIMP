@@ -1,0 +1,139 @@
+/* Navbar Container */
+.navbarContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background-image: url('/images/IMG_3402_s.PNG');
+  background-size: cover;
+  color: #ffffff;
+  z-index: 1000;
+}
+
+/* Navbar Flex Container */
+.navbarFlex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+/* Branding Styles */
+.branding {
+  margin-left: 10px;
+}
+
+/* Glitter Heading Effect */
+.glitter-text {
+  position: relative;
+  font-weight: bold;
+  animation: glitter 1.5s linear infinite;
+  background-clip: text;
+  color: #ffffff;
+}
+
+/* Sparkling Glitter Outline */
+@keyframes glitter {
+  0%, 100% {
+    text-shadow: 0 0 3px #ff6ac1, 0 0 7px #ff6ac1, 0 0 10px #ff6ac1,
+                 0 0 15px #ff6ac1, 0 0 20px #ff6ac1, 0 0 25px #ff6ac1;
+  }
+  50% {
+    text-shadow: 0 0 3px #ffd700, 0 0 7px #ffd700, 0 0 10px #ffd700,
+                 0 0 15px #ffd700, 0 0 20px #ffd700, 0 0 25px #ffd700;
+  }
+}
+
+/* Menu Items Styles */
+.menuItems {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* Button Frame Container */
+.buttonFrame {
+  display: inline-block;
+  padding: 8px;
+  border: 5px solid gold;
+  border-radius: 14px;
+  box-shadow: 0px 6px 24px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Button Frame Hover Effect */
+.buttonFrame:hover {
+  transform: scale(1.08);
+  box-shadow: 0px 14px 35px rgba(0, 0, 0, 0.5);
+}
+
+/* Base Jazzed Button Styles */
+.jazzedButton {
+  background: var(--button-bg);
+  color: var(--button-text);
+  padding: 14px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 15px;
+  display: block;
+  width: fit-content;
+  text-align: center;
+  font-size: 1.2rem;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+/* Mobile Optimization */
+@media (max-width: 768px) {
+  .navbarContainer {
+    flex-direction: column;
+    padding: 10px;
+  }
+
+  .menuItems {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .buttonFrame {
+    padding: 6px;
+    border: 4px solid gold;
+    border-radius: 10px;
+    box-shadow: 0px 4px 18px rgba(0, 0, 0, 0.3);
+  }
+
+  .jazzedButton {
+    padding: 12px 20px;
+    font-size: 1rem;
+  }
+}
+
+/* Add Hover Effects */
+.jazzedButton:hover {
+  background: var(--button-hover-bg);
+  transform: scale(1.1);
+}
+
+/* Different Button Variations */
+.jazzedButton.gold {
+  background: #ffd700;
+  color: #333;
+  border: 2px solid #e6b800;
+}
+
+.jazzedButton.purple {
+  background: #6a0dad;
+  color: #fff;
+  border: 2px solid #54148c;
+}
+
+.jazzedButton.red {
+  background: #ff6347;
+  color: #fff;
+  border: 2px solid #e94d35;
+}
+
+.jazzedButton.green {
+  background: #32cd32;
+  color: #fff;
+  border: 2px solid #2aa42a;
+}
