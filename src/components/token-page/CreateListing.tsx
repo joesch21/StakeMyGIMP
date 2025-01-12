@@ -90,7 +90,7 @@ export function CreateListing(props: Props) {
       </Flex>
 
       <Menu>
-        <MenuButton w="100%" as={Button} rightIcon={<ChevronDownIcon />}>
+        <MenuButton w="50%" as={Button} rightIcon={<ChevronDownIcon />}>
           {currency ? (
             <Flex alignItems="center">
               <Image boxSize="2rem" borderRadius="full" src={currency.icon} mr="12px" />
@@ -120,7 +120,7 @@ export function CreateListing(props: Props) {
 
       <Button
         colorScheme="blue"
-        w="100%"
+        w="50%"
         isDisabled={!currency}
         onClick={async () => {
           const value = priceRef.current?.value;
