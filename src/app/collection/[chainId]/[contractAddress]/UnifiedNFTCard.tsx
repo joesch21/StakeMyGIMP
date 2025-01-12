@@ -1,5 +1,3 @@
-"use client";
-
 import { client } from "@/consts/client";
 import {
   Accordion,
@@ -76,30 +74,26 @@ export function Token({ tokenId }: Props) {
     <Flex direction="column">
       <Box mt="24px" mx="auto">
         <Flex
-          direction={{ lg: "row", base: "column" }}
+          direction={{ base: "column", lg: "row" }}
           justifyContent={{ lg: "center", base: "space-between" }}
-          gap={{ lg: 20, base: 5 }}
+          gap="10px"
         >
           {/* NFT Image and Attributes Section */}
-          <Flex direction="column" w={{ lg: "45vw", base: "90vw" }} gap="5">
+          <Flex direction="column" w={{ base: "100%", lg: "45vw" }} gap="5">
             {nft?.metadata?.image && (
               <MediaRenderer
                 client={client}
                 src={nft.metadata.image}
-                style={{ width: "max-content", height: "auto", aspectRatio: "1" }}
+                style={{ width: "100%", borderRadius: "10px" }}
               />
             )}
             <Accordion allowMultiple defaultIndex={[0, 1, 2]}>
               {nft?.metadata?.description && (
                 <AccordionItem>
-                  <Text>
-                    <AccordionButton>
-                      <Box as="span" flex="1" textAlign="left">
-                        Description
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                  </Text>
+                  <AccordionButton>
+                    <Box flex="1" textAlign="left">Description</Box>
+                    <AccordionIcon />
+                  </AccordionButton>
                   <AccordionPanel pb={4}>
                     <Text>{nft.metadata.description}</Text>
                   </AccordionPanel>
@@ -115,7 +109,7 @@ export function Token({ tokenId }: Props) {
           </Flex>
 
           {/* NFT Details and Listing Section */}
-          <Box w={{ lg: "45vw", base: "90vw" }}>
+          <Box w={{ base: "100%", lg: "45vw" }}>
             <Text>Collection</Text>
             <Flex direction="row" gap="3">
               <Heading>{contractMetadata?.name || "N/A"}</Heading>
@@ -126,32 +120,26 @@ export function Token({ tokenId }: Props) {
                 <FaExternalLinkAlt size={20} />
               </Link>
             </Flex>
-            <br />
             <Text>Token ID: {nft?.id?.toString() || "N/A"}</Text>
             <Heading>{nft?.metadata?.name || "Unnamed NFT"}</Heading>
-            <br />
-            <Text>
-              Current Owner: {nft?.owner ? shortenAddress(nft.owner) : "N/A"}
-            </Text>
+            <Text>Current Owner: {nft?.owner ? shortenAddress(nft.owner) : "N/A"}</Text>
 
-            {/* ✅ Ensure proper data validation before rendering */}
+            {/* ✅ Render CreateListing only for the owner */}
             {nft && nft.id && ownedByYou && account ? (
-                <CreateListing tokenId={nft.id} account={account} />
+              <CreateListing tokenId={nft.id} account={account} />
             ) : (
-                <Text color="red">You are not the owner or data is missing.</Text>
+              <Text color="red">You are not the owner or data is missing.</Text>
             )}
 
             {/* Display Listings Section */}
             <Accordion mt="30px" defaultIndex={[0, 1]} allowMultiple>
               <AccordionItem>
-                <Text>
-                  <AccordionButton>
-                    <Box as="span" flex="1" textAlign="left">
-                      Listings ({listingsInSelectedCollection.length})
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                </Text>
+                <AccordionButton>
+                  <Box flex="1" textAlign="left">
+                    Listings ({listingsInSelectedCollection.length})
+                  </Box>
+                  <AccordionIcon />
+                </AccordionButton>
                 <AccordionPanel pb={4}>
                   {listingsInSelectedCollection.length > 0 ? (
                     <TableContainer>
@@ -185,13 +173,19 @@ export function Token({ tokenId }: Props) {
   );
 }
 
-// ✅ Fixed: Exporting the UnifiedNFTCard correctly with safe rendering
+// ✅ Updated UnifiedNFTCard for Mobile Optimization
 export default function UnifiedNFTCard({ nft, index, refetchOwnedNFTs, refetchStakedInfo }: any) {
     const account = useActiveAccount();
     const ownedByYou = nft?.owner?.toLowerCase() === account?.address.toLowerCase();
 
     return (
-        <Box p="10px" border="1px solid white" borderRadius="10px">
+        <Flex 
+            p="10px" 
+            border="1px solid white" 
+            borderRadius="10px"
+            direction="column"
+            w={{ base: "100%", md: "48%" }} // Single column for mobile, two for larger screens
+        >
             <MediaRenderer
                 client={client}
                 src={nft?.metadata?.image}
@@ -199,19 +193,19 @@ export default function UnifiedNFTCard({ nft, index, refetchOwnedNFTs, refetchSt
             />
             <Text mt="5px">Token ID: {nft?.id?.toString() || "N/A"}</Text>
             <Text>{nft?.metadata?.name || "Unnamed NFT"}</Text>
-            <Flex mt="10px" justifyContent="space-between">
+            <Flex mt="10px" direction="column" gap="10px">
                 {nft?.owner ? (
                     <Text>Owned by: {shortenAddress(nft.owner)}</Text>
                 ) : (
                     <Text>Owner not available</Text>
                 )}
-                {/* Ensure NFT and Account are properly validated */}
+                {/* Only show listing button for the owner */}
                 {nft && nft.id && ownedByYou && account ? (
                     <CreateListing tokenId={nft.id} account={account} />
                 ) : (
                     <Text color="red">You are not the owner or missing data.</Text>
                 )}
             </Flex>
-        </Box>
+        </Flex>
     );
 }
