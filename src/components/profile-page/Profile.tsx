@@ -14,14 +14,11 @@ import { shortenAddress } from "thirdweb/utils";
 import { ProfileMenu } from "./Menu";
 import { useState } from "react";
 import { NFT_CONTRACTS, type NftContract } from "@/consts/nft_contracts";
-import {
-  useActiveAccount,
-  useReadContract,
-} from "thirdweb/react";
+import { useActiveAccount, useReadContract } from "thirdweb/react";
 import { getContract, toEther } from "thirdweb";
 import { client } from "@/consts/client";
 import { getOwnedERC721s } from "@/extensions/getOwnedERC721s";
-import UnifiedNFTGallery from "./UnifiedNFTGallery"; 
+import UnifiedNFTGallery from "./UnifiedNFTGallery";
 import { MARKETPLACE_CONTRACTS } from "@/consts/marketplace_contract";
 import { Link } from "@chakra-ui/next-js";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
@@ -40,7 +37,9 @@ export function ProfileSection(props: Props) {
   const { data: ensName } = useGetENSName({ address });
   const { data: ensAvatar } = useGetENSAvatar({ ensName });
   const [tabIndex, setTabIndex] = useState<number>(0);
-  const [selectedCollection, setSelectedCollection] = useState<NftContract>(NFT_CONTRACTS[0]);
+  const [selectedCollection, setSelectedCollection] = useState<NftContract>(
+    NFT_CONTRACTS[0]
+  );
 
   const contract = getContract({
     address: selectedCollection.address,
@@ -48,24 +47,24 @@ export function ProfileSection(props: Props) {
     client,
   });
 
-  const { data: ownedNFTs, isLoading: isLoadingOwnedNFTs, refetch: refetchOwnedNFTs } = useReadContract(
-    getOwnedERC721s,
-    {
-        contract,
-        owner: address,
-        requestPerSec: 50,
-        queryOptions: {
-            enabled: !!address,
-        },
-    }
-);
-
+  const {
+    data: ownedNFTs,
+    isLoading: isLoadingOwnedNFTs,
+    refetch: refetchOwnedNFTs,
+  } = useReadContract(getOwnedERC721s, {
+    contract,
+    owner: address,
+    requestPerSec: 50,
+    queryOptions: {
+      enabled: !!address,
+    },
+  });
 
   const chain = contract.chain;
   const marketplaceContractAddress = MARKETPLACE_CONTRACTS.find(
     (o) => o.chain.id === chain.id
   )?.address;
-  
+
   if (!marketplaceContractAddress) throw Error("No marketplace contract found");
 
   const marketplaceContract = getContract({
@@ -130,10 +129,12 @@ export function ProfileSection(props: Props) {
       {isLoadingOwnedNFTs ? (
         <Text>Loading...</Text>
       ) : tabIndex === 0 ? (
-        <UnifiedNFTGallery 
-    ownedNFTs={ownedNFTs ?? []} 
-    refetchOwnedNFTs={refetchOwnedNFTs} 
-    refetchStakedInfo={() => {}} 
+        <UnifiedNFTGallery
+    ownedNFTs={ownedNFTs ?? []}
+    refetchOwnedNFTs={refetchOwnedNFTs}
+    refetchStakedInfo={() => {}}
+    chainId={selectedCollection.chain.id.toString()}  // ✅ Corrected: Ensure chainId is passed as a string
+    contractAddress={selectedCollection.address}  // ✅ Corrected: Added the missing contractAddress prop
 />
 
       ) : (
@@ -142,7 +143,9 @@ export function ProfileSection(props: Props) {
             listings.map((item, index) => (
               <Box key={index} border="1px solid white" p="10px">
                 <Link
-                  href={`/collection/${contract.chain.id}/${contract.address}/token/${item.asset.id.toString()}`}
+                  href={`/collection/${contract.chain.id}/${
+                    contract.address
+                  }/token/${item.asset.id.toString()}`}
                   color="white"
                 >
                   <Text>{item.asset.metadata.name ?? "Unnamed NFT"}</Text>

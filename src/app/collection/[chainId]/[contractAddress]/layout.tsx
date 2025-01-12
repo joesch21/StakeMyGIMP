@@ -1,3 +1,4 @@
+// src/app/collection/[chainId]/[contractAddress]/layout.tsx
 import MarketplaceProvider from "@/hooks/useMarketplaceContext";
 import type { ReactNode } from "react";
 
