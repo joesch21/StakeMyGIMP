@@ -1,14 +1,12 @@
 "use client";
 
 import { Box, Text, Link, Button } from "@chakra-ui/react";
-import React from "react"; // Ensure React is imported
+import React from "react";
 
-// Define the `PurchaseGCC` component with React.FC type correctly
 const PurchaseGCC: React.FC = () => {
   // Function to add GCC Token to MetaMask
   const addGCCToMetaMask = async () => {
     try {
-      // Use type assertion to access ethereum on the window object
       const ethereum = (window as any).ethereum;
 
       if (ethereum) {
@@ -29,9 +27,8 @@ const PurchaseGCC: React.FC = () => {
         alert("MetaMask is not installed. Please install MetaMask and try again.");
       }
     } catch (error: any) {
-        console.error(`Failed to add GCC token to MetaMask: ${error?.message || String(error)}`);
-      }
-      
+      console.error(`Failed to add GCC token to MetaMask: ${error?.message || String(error)}`);
+    }
   };
 
   return (
@@ -54,7 +51,7 @@ const PurchaseGCC: React.FC = () => {
         textAlign="center"
       >
         <Text fontSize="3xl" fontWeight="bold">
-          GCC Man! You need that Shit - If you want You to Buy an NFT!
+          Gold Condor Capital GCC - a BSC Chain Token
         </Text>
       </Box>
 
@@ -86,6 +83,7 @@ const PurchaseGCC: React.FC = () => {
         boxShadow="lg"
         bg="whiteAlpha.400"
         textAlign="center"
+        mb="20px"
       >
         <Link
           href="https://pancakeswap.finance/swap?outputCurrency=0x092ac429b9c3450c9909433eb0662c3b7c13cf9a"
@@ -111,7 +109,7 @@ const PurchaseGCC: React.FC = () => {
         boxShadow="lg"
         bg="whiteAlpha.400"
         textAlign="center"
-        mb="30px"
+        mb="20px"
       >
         <Button
           size="lg"
@@ -124,6 +122,32 @@ const PurchaseGCC: React.FC = () => {
         >
           Add GCC Token to MetaMask
         </Button>
+      </Box>
+
+      {/* Gold Condor Capital Website Link */}
+      <Box
+        borderRadius="12px"
+        padding="10px"
+        boxShadow="lg"
+        bg="whiteAlpha.200"
+        textAlign="center"
+        mb="20px"
+      >
+        <Link
+          href="https://www.goldcondorcapital.com" // Replace with the correct Gold Condor Capital URL
+          isExternal
+        >
+          <Button
+            size="lg"
+            colorScheme="teal"
+            fontWeight="bold"
+            bg="green.400"
+            color="white"
+            _hover={{ bg: "green.500" }}
+          >
+            Visit Gold Condor Capital Website
+          </Button>
+        </Link>
       </Box>
 
       {/* Mobile Optimization Explanation */}
@@ -144,5 +168,4 @@ const PurchaseGCC: React.FC = () => {
   );
 };
 
-// Use `export default` for Next.js compatibility
 export default PurchaseGCC;
