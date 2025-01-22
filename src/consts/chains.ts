@@ -5,7 +5,3 @@ import { defineChain } from "thirdweb";
  */
 export { bsc } from "thirdweb/chains";
 
-/**
- * Define any custom chain using `defineChain`
- */
-export const example_customChain1 = defineChain(0.001); // don't actually use this
