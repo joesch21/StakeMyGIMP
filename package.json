@@ -41,5 +41,9 @@
   "browser": {
     "fs": false,
     "net": false
-  }
+  },
+  "resolutions": {
+  "@emotion/react": "^11.11.4"
+}
+
 }

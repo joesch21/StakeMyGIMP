@@ -1,9 +1,12 @@
+//useMarketplaceContect.tsx 
+
 "use client";
 
 import { client } from "@/consts/client";
 import { MARKETPLACE_CONTRACTS } from "@/consts/marketplace_contract";
 import { NFT_CONTRACTS } from "@/consts/nft_contracts";
 import { SUPPORTED_TOKENS, Token } from "@/consts/supported_tokens";
+import { STAKING_CONTRACT } from "@/consts/nft_contracts"; 
 import {
   getSupplyInfo,
   SupplyInfo,
@@ -32,6 +35,7 @@ const SUPPORT_AUCTION = false;
 type TMarketplaceContext = {
   marketplaceContract: ThirdwebContract;
   nftContract: ThirdwebContract;
+  stakingContract: ThirdwebContract; // ✅ Added staking contract
   type: NftType;
   isLoading: boolean;
   allValidListings: DirectListing[] | undefined;
@@ -54,15 +58,12 @@ const MarketplaceContext = createContext<TMarketplaceContext | undefined>(
   undefined
 );
 
-export default function MarketplaceProvider({
-  chainId,
-  contractAddress,
-  children,
-}: {
+export function MarketplaceProvider({ chainId, contractAddress, children }: {
   chainId: string;
   contractAddress: string;
   children: ReactNode;
 }) {
+
   let _chainId: number;
   try {
     _chainId = Number.parseInt(chainId);
@@ -167,6 +168,7 @@ export default function MarketplaceProvider({
       value={{
         marketplaceContract: marketplace,
         nftContract: contract,
+        stakingContract: STAKING_CONTRACT, 
         isLoading,
         type: is1155 ? "ERC1155" : "ERC721",
         allValidListings,

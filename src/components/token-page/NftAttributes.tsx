@@ -12,15 +12,18 @@ import {
 export function NftAttributes({
   attributes,
 }: {
-  attributes: Record<string, unknown>;
+  attributes: Record<string, string | number | boolean>;
+
 }) {
   /**
    * Assume the NFT attributes follow the conventional format
    */
   // @ts-ignore TODO Fix later
-  const items = attributes.filter(
-    (item: Record<string, unknown>) => item.trait_type
-  );
+  const items = Object.entries(attributes).map(([key, value]) => ({
+    trait_type: key,
+    value,
+  }));
+  
   return (
     <AccordionItem>
       <Text>
