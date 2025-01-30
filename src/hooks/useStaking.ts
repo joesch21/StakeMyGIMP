@@ -17,15 +17,21 @@ export function useStakingInfo() {
     abi: stakingABI,
   });
 
-  // ✅ Fetch staking info
-  const { data: stakeInfo, isLoading, refetch } = useReadContract({
-    contract: stakingContract,
-    method: "getStakeInfo",
-    params: activeAccount?.address ? [activeAccount.address] : [],
-    queryOptions: {
-      enabled: !!activeAccount?.address, // Only run if account is connected
-    },
-  });
+// ✅ Fetch staking info
+const { data: stakeInfo, isLoading, refetch } = useReadContract({
+  contract: stakingContract,
+  method: "getStakeInfo",
+  // @ts-expect-error ❌ Suppress only if an error exists
+  params: activeAccount?.address 
+    ? ([activeAccount.address] as [string]) 
+    : (() => Promise.resolve([""]) as unknown as () => Promise<[string]>),
+  queryOptions: {
+    enabled: !!activeAccount?.address, // ✅ Only run if account is connected
+  },
+});
+
+
+
 
   return {
     stakeInfo,

@@ -1,12 +1,9 @@
-//useMarketplaceContect.tsx 
-
 "use client";
 
 import { client } from "@/consts/client";
 import { MARKETPLACE_CONTRACTS } from "@/consts/marketplace_contract";
-import { NFT_CONTRACTS } from "@/consts/nft_contracts";
+import { NFT_CONTRACTS, STAKING_CONTRACT } from "@/consts/nft_contracts"; // ✅ Imported STAKING_CONTRACT
 import { SUPPORTED_TOKENS, Token } from "@/consts/supported_tokens";
-import { STAKING_CONTRACT } from "@/consts/nft_contracts"; 
 import {
   getSupplyInfo,
   SupplyInfo,
@@ -27,15 +24,12 @@ import { useReadContract } from "thirdweb/react";
 
 export type NftType = "ERC1155" | "ERC721";
 
-/**
- * Support for English auction coming soon.
- */
 const SUPPORT_AUCTION = false;
 
 type TMarketplaceContext = {
   marketplaceContract: ThirdwebContract;
   nftContract: ThirdwebContract;
-  stakingContract: ThirdwebContract; // ✅ Added staking contract
+  stakingContract: ThirdwebContract; // ✅ Staking contract
   type: NftType;
   isLoading: boolean;
   allValidListings: DirectListing[] | undefined;
@@ -70,12 +64,20 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
   } catch (err) {
     throw new Error("Invalid chain ID");
   }
+
   const marketplaceContract = MARKETPLACE_CONTRACTS.find(
     (item) => item.chain.id === _chainId
   );
   if (!marketplaceContract) {
     throw new Error("Marketplace not supported on this chain");
   }
+
+  // ✅ Corrected: Ensure `stakingContract` is recognized as a valid ThirdwebContract
+  const stakingContract = getContract({
+    address: STAKING_CONTRACT.address, // ✅ Ensure correct format
+    chain: marketplaceContract.chain,
+    client,
+  });
 
   const contract = getContract({
     chain: marketplaceContract.chain,
@@ -91,10 +93,9 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
 
   const { data: is721, isLoading: isChecking721 } = useReadContract(isERC721, {
     contract,
-    queryOptions: {
-      enabled: !!marketplaceContract,
-    },
+    queryOptions: { enabled: !!marketplaceContract },
   });
+
   const { data: is1155, isLoading: isChecking1155 } = useReadContract(
     isERC1155,
     { contract, queryOptions: { enabled: !!marketplaceContract } }
@@ -110,9 +111,7 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
   const { data: contractMetadata, isLoading: isLoadingContractMetadata } =
     useReadContract(getContractMetadata, {
       contract,
-      queryOptions: {
-        enabled: isNftCollection,
-      },
+      queryOptions: { enabled: isNftCollection },
     });
 
   const {
@@ -122,9 +121,7 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
     isRefetching: isRefetchingAllListings,
   } = useReadContract(getAllValidListings, {
     contract: marketplace,
-    queryOptions: {
-      enabled: isNftCollection,
-    },
+    queryOptions: { enabled: isNftCollection },
   });
 
   const listingsInSelectedCollection = allValidListings?.length
@@ -145,9 +142,7 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
 
   const { data: supplyInfo, isLoading: isLoadingSupplyInfo } = useReadContract(
     getSupplyInfo,
-    {
-      contract,
-    }
+    { contract }
   );
 
   const isLoading =
@@ -168,7 +163,7 @@ export function MarketplaceProvider({ chainId, contractAddress, children }: {
       value={{
         marketplaceContract: marketplace,
         nftContract: contract,
-        stakingContract: STAKING_CONTRACT, 
+        stakingContract: stakingContract, // ✅ Pass the corrected contract
         isLoading,
         type: is1155 ? "ERC1155" : "ERC721",
         allValidListings,

@@ -62,7 +62,7 @@ export function SideMenu() {
             </Box>
             {account && (
               <Link href="/profile">
-                Profile {ensName ? `(${ensName})` : ""}
+                NFT Assets {ensName ? `(${ensName})` : ""}
               </Link>
             )}
           </DrawerBody>

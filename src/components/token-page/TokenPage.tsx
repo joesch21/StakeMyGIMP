@@ -127,7 +127,8 @@ export function Token(props: Props) {
               {nft?.metadata?.attributes &&
                 // @ts-ignore TODO FIx later
                 nft?.metadata?.attributes.length > 0 && (
-                  <NftAttributes attributes={nft.metadata.attributes} />
+                  <NftAttributes attributes={nft.metadata.attributes as Record<string, string | number | boolean>} />
+
                 )}
 
               {nft && <NftDetails nft={nft} />}

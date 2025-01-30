@@ -1,3 +1,5 @@
+"use Client"
+
 import {
   Box,
   Flex,
@@ -28,6 +30,7 @@ import { useGetENSAvatar } from "@/hooks/useGetENSAvatar";
 import { useGetENSName } from "@/hooks/useGetENSName";
 import { getAllValidListings } from "thirdweb/extensions/marketplace";
 import { useStakingInfo } from "@/hooks/useStakingInfo"; // ✅ Import Staking Info
+import EmbeddedWallet from "../EmbeddedWallet";
 
 type Props = {
   address: string;
@@ -138,10 +141,14 @@ export function ProfileSection({ address }: Props) {
       <Flex direction={{ lg: "row", md: "column", sm: "column" }} gap={5}>
         <Img src={ensAvatar ?? blo(address as `0x${string}`)} w={{ lg: 150, base: 100 }} rounded="8px" />
         <Box my="auto">
-          <Heading>{ensName ?? "Unnamed"}</Heading>
+          <Heading>{ensName ?? "Gold Condor Capital Member"}</Heading>
           <Text color="gray">{shortenAddress(address)}</Text>
         </Box>
       </Flex>
+
+      <Box mt="20px">
+  <EmbeddedWallet />
+</Box>
 
       {/* Profile Menu */}
       <ProfileMenu selectedCollection={selectedCollection} setSelectedCollection={setSelectedCollection} />
@@ -150,7 +157,6 @@ export function ProfileSection({ address }: Props) {
       <Tabs variant="soft-rounded" onChange={(index) => setTabIndex(index)} isLazy defaultIndex={0} mt="20px">
         <TabList>
           <Tab>Owned ({ownedNFTs?.length ?? 0})</Tab>
-          <Tab>Staked ({stakedNFTs.length})</Tab> {/* ✅ NEW TAB FOR STAKED */}
           <Tab>Listings ({listings.length})</Tab>
         </TabList>
 
@@ -170,26 +176,13 @@ export function ProfileSection({ address }: Props) {
             )}
           </TabPanel>
 
-          {/* Staked NFTs */}
-          <TabPanel>
-            {stakedNFTs.length > 0 ? (
-              <UnifiedNFTGallery
-                ownedNFTs={stakedNFTs}
-                refetchOwnedNFTs={refetchOwnedNFTs}
-                refetchStakedInfo={refetchStakedInfo}
-                chainId={selectedCollection.chain.id.toString()}
-                contractAddress={selectedCollection.address}
-              />
-            ) : (
-              <Text>No staked NFTs found.</Text>
-            )}
-          </TabPanel>
+         
 
           {/* Listings */}
           <TabPanel>
             {listings.length > 0 ? (
               listings.map((item, index) => (
-                <Box key={index} border="1px solid white" p="10px">
+                <Box key={index} border="1px solid white" p="4px">
                   <Link href={`/collection/${contract.chain.id}/${contract.address}/token/${item.asset.id.toString()}`} color="white">
                     <Text>{item.asset.metadata.name ?? "Unnamed NFT"}</Text>
                     <Text>Price: {toEther(item.pricePerToken)}</Text>

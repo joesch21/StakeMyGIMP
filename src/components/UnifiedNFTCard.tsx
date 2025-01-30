@@ -21,15 +21,11 @@ import { shortenAddress } from "thirdweb/utils";
 import { NftAttributes } from "@/components/token-page/NftAttributes";
 import { CreateListing } from "@/components/token-page/CreateListing";
 import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import dynamic from "next/dynamic";
-import { useStakingInfo } from "@/hooks/useStaking";
-import { StakeButton } from "@/components/StakeButton";
+import { useStakingInfo } from "@/hooks/useStakingInfo"; // ✅ Ensure Correct Hook Import
+import { StakeButton } from "@/components/StakeButton"; // ✅ Direct Import (no need for dynamic import)
 import { prepareContractCall } from "thirdweb";
 import { STAKING_CONTRACT } from "@/consts/nft_contracts";
 import { useSendTransaction } from "thirdweb/react";
-
-const CancelListingButton = dynamic(() => import("@/components/token-page/CancelListingButton"), { ssr: false });
-const BuyFromListingButton = dynamic(() => import("@/components/token-page/BuyFromListingButton"), { ssr: false });
 
 type NFTMetadata = {
   image?: string;
@@ -56,77 +52,22 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
   const account = useActiveAccount();
   const [metadata, setMetadata] = useState<NFTMetadata | null>(nft.metadata ?? null);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
-  const { stakeInfo, refetch: refetchStaking } = useStakingInfo();
+  const { refetch: refetchStaking } = useStakingInfo();
   const [isClaiming, setIsClaiming] = useState(false);
-  const [isUnstaking, setIsUnstaking] = useState(false);
   const { mutate: sendTransaction } = useSendTransaction();
 
-  const handleClaimRewards = async () => {
-    if (!account) return;
-
-    setIsClaiming(true);
-    try {
-      const claimTx = prepareContractCall({
-        contract: STAKING_CONTRACT,
-        method: "claimRewards",
-        params: [[BigInt(nft.id)]], // ✅ Ensure correct format
-      });
-
-      const txResult = await sendTransaction(claimTx);
-      await txResult.wait(); // ✅ Wait for confirmation before updating UI
-
-      refetchStakedInfo(); // ✅ Refresh staking info
-      refetchOwnedNFTs(); // ✅ Refresh NFT ownership info
-    } catch (error) {
-      console.error("Claiming Rewards Failed:", error);
-    } finally {
-      setIsClaiming(false);
-    }
-  };
-
-  const handleUnstake = async () => {
-    if (!account) return;
-
-    setIsUnstaking(true);
-    try {
-      const unstakeTx = prepareContractCall({
-        contract: STAKING_CONTRACT,
-        method: "withdraw",
-        params: [[BigInt(nft.id)]], // ✅ Ensure correct format
-      });
-
-      const txResult = await sendTransaction(unstakeTx);
-      await txResult.wait(); // ✅ Wait for confirmation before updating UI
-
-      refetchStakedInfo(); // ✅ Refresh staking info
-      refetchOwnedNFTs(); // ✅ Ensure the NFT appears in the owned list again
-    } catch (error) {
-      console.error("Unstaking Failed:", error);
-    } finally {
-      setIsUnstaking(false);
-    }
-  };
-
+  // ✅ Fetch Metadata If Not Already Provided
   useEffect(() => {
-    if (nft.metadata) {
-      console.log("Using existing metadata:", nft.metadata);
-      return;
-    }
-  
-    if (!nft.tokenURI || typeof nft.tokenURI !== "string") {
-      console.warn("Invalid tokenURI:", nft.tokenURI);
-      return;
-    }
-  
+    if (nft.metadata) return;
+    if (!nft.tokenURI || typeof nft.tokenURI !== "string") return;
+
     const fetchMetadata = async () => {
       try {
         setIsLoadingMetadata(true);
-        console.log("Fetching metadata from:", nft.tokenURI);
         const response = await fetch(nft.tokenURI);
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-  
+
         const json = await response.json();
-  
         setMetadata({
           image: json.image || "/images/default.png",
           name: json.name || "Unnamed NFT",
@@ -145,11 +86,10 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
         setIsLoadingMetadata(false);
       }
     };
-  
+
     fetchMetadata();
   }, [nft.tokenURI]);
-  
-  
+
   
 
   if (!account) {
@@ -211,15 +151,7 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
 
       {isStaked && (
         <Box mt="10px">
-          <Text fontSize="sm">
-            Earned Rewards: <strong>{(Number(reward) / 1e18).toFixed(4)} TOKEN</strong>
-          </Text>
-          <Button colorScheme="yellow" size="sm" mt="2" onClick={handleClaimRewards} isLoading={isClaiming}>
-            Claim Rewards
-          </Button>
-          <Button colorScheme="red" size="sm" mt="2" onClick={handleUnstake} isLoading={isUnstaking}>
-            Unstake NFT
-          </Button>
+          
         </Box>
       )}
     </Flex>

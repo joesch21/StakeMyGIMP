@@ -7,8 +7,9 @@ export function useStakingInfo() {
   const { data, refetch } = useReadContract({
     contract: STAKING_CONTRACT,
     method: "getStakeInfo",
-    params: [account?.address],
+    params: [account?.address ?? ""], // ✅ Fallback to empty string if undefined
   });
+  
 
   return { data, refetch };
 }
