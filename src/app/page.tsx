@@ -79,14 +79,14 @@ export default function Home() {
 
             <Button 
               as="a" 
-              href="https://gcc-staking.vercel.app/" 
+              href="https://www.gcc-bsc.online/main.html" 
               target="_blank" 
               rel="noopener noreferrer"
               colorScheme="teal"
               size="md"
               mb="20px"
             >
-              Visit Staking Page To Earn GCC!
+              Visit Gold Condor Capital - GCC!
             </Button>
 
             <Flex
