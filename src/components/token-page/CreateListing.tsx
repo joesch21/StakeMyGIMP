@@ -177,11 +177,13 @@ export function CreateListing(props: Props) {
           const transaction = createListing({
             contract: marketplaceContract,
             assetContractAddress: nftContract.address,
-            tokenId,
+            tokenId: BigInt(tokenId), // ✅ Ensure it's always a bigint
+
             quantity: type === "ERC721" ? 1n : _qty,
             currencyContractAddress: currency?.tokenAddress,
             pricePerToken: value,
           });
+          
 
           await sendAndConfirmTransaction({ transaction, account });
           refetchAllListings();

@@ -16,41 +16,44 @@ type NFT = {
 
 type UnifiedNFTGalleryProps = {
   ownedNFTs: NFT[];
+  listings: NFT[];
   refetchOwnedNFTs: () => void;
-  refetchStakedInfo: () => void;
+  refetchStakedInfo?: () => void; // ✅ Now Optional
   chainId: string;
   contractAddress: string;
 };
 
+
 export const UnifiedNFTGallery = ({
   ownedNFTs,
+  listings, // ✅ Ensure listings is included here
   refetchOwnedNFTs,
   refetchStakedInfo,
   chainId,
   contractAddress,
 }: UnifiedNFTGalleryProps) => {
-  // ✅ Now we only use `ownedNFTs`, since staked ones disappear from this list
-  if (ownedNFTs.length === 0) {
+  // ✅ Merge owned & listed NFTs safely
+  const allNFTs: NFT[] = [...(ownedNFTs ?? []), ...(listings ?? [])];
+
+  if (allNFTs.length === 0) {
     return <Text color="gray" textAlign="center" mt="20px">No NFTs found in this collection.</Text>;
   }
 
   return (
     <MarketplaceProvider chainId={chainId} contractAddress={contractAddress}>
       <SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 5 }} spacing="10px" justifyContent="center" mt="20px">
-        {ownedNFTs.map((nft, index) => (
+        {allNFTs.map((nft, index) => (
           <UnifiedNFTCard
-          key={nft.id.toString() || `nft-${index}`}
-          nft={{ 
-            ...nft, 
-            id: nft.id.toString(),
-            tokenURI: nft.tokenURI || "" // ✅ Ensure tokenURI is always a string
-          }}
-          
-        
-            isStaked={false} // ✅ We no longer need to check staking status
-            reward={0n} // ✅ Rewards are only relevant for staked NFTs
+            key={nft.id.toString() || `nft-${index}`}
+            nft={{ 
+              ...nft, 
+              id: nft.id.toString(),
+              tokenURI: nft.tokenURI || "" // ✅ Ensure tokenURI is always a string
+            }}
+            isStaked={false} // ✅ No need to check staking
+            reward={0n} // ✅ Rewards are only for staked NFTs
             refetchOwnedNFTs={refetchOwnedNFTs}
-            refetchStakedInfo={refetchStakedInfo}
+            refetchStakedInfo={refetchStakedInfo ?? (() => {})}
           />
         ))}
       </SimpleGrid>

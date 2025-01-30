@@ -21,9 +21,7 @@ import { shortenAddress } from "thirdweb/utils";
 import { NftAttributes } from "@/components/token-page/NftAttributes";
 import { CreateListing } from "@/components/token-page/CreateListing";
 import { useMarketplaceContext } from "@/hooks/useMarketplaceContext";
-import { useStakingInfo } from "@/hooks/useStakingInfo"; // ✅ Ensure Correct Hook Import
-import { StakeButton } from "@/components/StakeButton"; // ✅ Direct Import (no need for dynamic import)
-import { prepareContractCall } from "thirdweb";
+import { StakeButton } from "@/components/StakeButton"; 
 import { STAKING_CONTRACT } from "@/consts/nft_contracts";
 import { useSendTransaction } from "thirdweb/react";
 
@@ -40,6 +38,7 @@ type Props = {
     owner: string | null;
     metadata?: NFTMetadata;
     tokenURI: string;
+    isListed?: boolean; // ✅ Ensure this property exists
   };
   isStaked: boolean;
   reward: bigint;
@@ -52,7 +51,6 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
   const account = useActiveAccount();
   const [metadata, setMetadata] = useState<NFTMetadata | null>(nft.metadata ?? null);
   const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
-  const { refetch: refetchStaking } = useStakingInfo();
   const [isClaiming, setIsClaiming] = useState(false);
   const { mutate: sendTransaction } = useSendTransaction();
 
@@ -90,8 +88,6 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
     fetchMetadata();
   }, [nft.tokenURI]);
 
-  
-
   if (!account) {
     return <Text color="red">Please connect your wallet to view this NFT.</Text>;
   }
@@ -113,6 +109,13 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
           <Heading size="md">{metadata?.name || "Unnamed NFT"}</Heading>
           <Text>Token ID: {nft?.id}</Text>
           <Text>Current Owner: {nft?.owner ? shortenAddress(nft.owner) : "N/A"}</Text>
+
+          {/* ✅ Check if NFT is Listed */}
+          {nft.isListed && (
+            <Text fontWeight="bold" color="blue.400">
+              Listed for Sale! 🛒
+            </Text>
+          )}
 
           <Flex direction="row" gap="3" mt="10px">
             <Text>Collection:</Text>
@@ -143,15 +146,26 @@ function UnifiedNFTCard({ nft, isStaked, reward, refetchOwnedNFTs, refetchStaked
         </Accordion>
       </Box>
 
+      {/* ✅ Show Stake Button for Owned NFTs */}
       {ownedByYou && (
         <Box mt="10px">
           <StakeButton tokenId={BigInt(nft.id)} refetch={refetchStakedInfo} />
         </Box>
       )}
+      {ownedByYou && !nft.isListed && !isStaked && (
+  <Box mt="10px">
+    <CreateListing tokenId={BigInt(nft.id)} account={account} />
 
-      {isStaked && (
+  </Box>
+)}
+
+
+      {/* ✅ Additional Actions for Listed NFTs */}
+      {nft.isListed && (
         <Box mt="10px">
-          
+          <Button colorScheme="blue" size="sm">
+            View Listing
+          </Button>
         </Box>
       )}
     </Flex>

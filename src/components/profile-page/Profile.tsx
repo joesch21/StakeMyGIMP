@@ -1,4 +1,4 @@
-"use Client"
+"use client";
 
 import {
   Box,
@@ -11,7 +11,6 @@ import {
   TabPanel,
   Tabs,
   Text,
-  useBreakpointValue,
 } from "@chakra-ui/react";
 import { blo } from "blo";
 import { shortenAddress } from "thirdweb/utils";
@@ -24,13 +23,11 @@ import { client } from "@/consts/client";
 import { getOwnedERC721s } from "@/extensions/getOwnedERC721s";
 import UnifiedNFTGallery from "../UnifiedNFTGallery";
 import { MARKETPLACE_CONTRACTS } from "@/consts/marketplace_contract";
-import { Link } from "@chakra-ui/next-js";
-import { ExternalLinkIcon } from "@chakra-ui/icons";
 import { useGetENSAvatar } from "@/hooks/useGetENSAvatar";
 import { useGetENSName } from "@/hooks/useGetENSName";
 import { getAllValidListings } from "thirdweb/extensions/marketplace";
-import { useStakingInfo } from "@/hooks/useStakingInfo"; // ✅ Import Staking Info
 import EmbeddedWallet from "../EmbeddedWallet";
+import { useStakingInfo } from "@/hooks/useStakingInfo"; // ✅ Import the staking hook
 
 type Props = {
   address: string;
@@ -41,7 +38,6 @@ export function ProfileSection({ address }: Props) {
   const isYou = address.toLowerCase() === account?.address.toLowerCase();
   const { data: ensName } = useGetENSName({ address });
   const { data: ensAvatar } = useGetENSAvatar({ ensName });
-  const [tabIndex, setTabIndex] = useState<number>(0);
   const [selectedCollection, setSelectedCollection] = useState<NftContract>(
     NFT_CONTRACTS[0]
   );
@@ -52,6 +48,7 @@ export function ProfileSection({ address }: Props) {
     client,
   });
 
+  // ✅ Fetch Owned NFTs
   const {
     data: ownedNFTs,
     isLoading: isLoadingOwnedNFTs,
@@ -65,57 +62,19 @@ export function ProfileSection({ address }: Props) {
     },
   });
 
-  const { data: stakingData, refetch: refetchStakedInfo } = useStakingInfo() as {
-    data: [bigint[], Record<string, string>, string[]] | undefined;
-    refetch: () => void;
-  };
+  // ✅ Fetch Staking Info
+  const { refetch: refetchStakedInfo } = useStakingInfo();
 
-  // ✅ Ensure stakingData is valid
-  const stakedTokenIds: bigint[] = Array.isArray(stakingData?.[0]) ? [...stakingData[0]] : [];
-  const stakerAddresses: string[] = Array.isArray(stakingData?.[2]) ? stakingData[2] : [];
-
-  // ✅ Convert reward mapping into accessible format
-  const rewardAmounts: Record<string, string> =
-    stakingData?.[1]
-      ? Object.fromEntries(
-          Object.entries(stakingData[1]).map(([key, value]) => [key, value.toString()])
-        )
-      : {};
-
-  // ✅ Only include staked NFTs belonging to the logged-in user
-  const userStakedTokenIds = stakedTokenIds.filter((id) => {
-    return (
-      ownedNFTs?.some((nft) => BigInt(nft.id) === id) || // Check if originally owned
-      stakerAddresses.some(
-        (staker) => staker.toLowerCase() === account?.address.toLowerCase()
-      ) // Verify it's owned by the logged-in user
-    );
-  });
-
-  // ✅ Prevent duplicate NFTs in "Staked" section
-  const uniqueStakedNFTs = new Map<string, any>();
-
-  userStakedTokenIds.forEach((id: bigint) => {
-    const nftId = id.toString();
-    if (!uniqueStakedNFTs.has(nftId)) {
-      uniqueStakedNFTs.set(nftId, {
-        id,
-        owner: null, // Contract holds the NFT
-        isStaked: true,
-        metadata: {}, // Metadata will be fetched separately
-        reward: rewardAmounts[nftId] ?? "0",
-      });
-    }
-  });
-
-  const stakedNFTs = Array.from(uniqueStakedNFTs.values());
-
+  // ✅ Get Marketplace Contract
   const chain = contract.chain;
   const marketplaceContractAddress = MARKETPLACE_CONTRACTS.find(
     (o) => o.chain.id === chain.id
   )?.address;
 
-  if (!marketplaceContractAddress) throw Error("No marketplace contract found");
+  if (!marketplaceContractAddress) {
+    console.error("No marketplace contract found for this chain.");
+    return <Text color="red">Marketplace not available on this chain.</Text>;
+  }
 
   const marketplaceContract = getContract({
     address: marketplaceContractAddress,
@@ -123,23 +82,32 @@ export function ProfileSection({ address }: Props) {
     client,
   });
 
-  const { data: allValidListings, isLoading: isLoadingValidListings } =
-    useReadContract(getAllValidListings, {
-      contract: marketplaceContract,
-      queryOptions: { enabled: !!ownedNFTs?.length },
-    });
+  // ✅ Fetch Listings
+  const { data: allValidListings } = useReadContract(getAllValidListings, {
+    contract: marketplaceContract,
+    queryOptions: { enabled: !!ownedNFTs?.length },
+  });
 
-  const listings = allValidListings?.filter(
-    (item) =>
-      item.assetContractAddress.toLowerCase() === contract.address.toLowerCase() &&
-      item.creatorAddress.toLowerCase() === address.toLowerCase()
-  ) ?? [];
+  // ✅ Format Listings to Match NFT Structure
+  const listings = allValidListings
+    ? allValidListings.map((item) => ({
+        id: BigInt(item.asset.id), // Ensure BigInt
+        owner: item.creatorAddress,
+        metadata: item.asset.metadata,
+        tokenURI: item.asset.metadata.image ?? "",
+        isListed: true, // ✅ Pass this to `UnifiedNFTCard`
+      }))
+    : [];
 
   return (
     <Box px={{ lg: "50px", base: "20px" }}>
       {/* Profile Header */}
       <Flex direction={{ lg: "row", md: "column", sm: "column" }} gap={5}>
-        <Img src={ensAvatar ?? blo(address as `0x${string}`)} w={{ lg: 150, base: 100 }} rounded="8px" />
+        <Img
+          src={ensAvatar ?? blo(address as `0x${string}`)}
+          w={{ lg: 150, base: 100 }}
+          rounded="8px"
+        />
         <Box my="auto">
           <Heading>{ensName ?? "Gold Condor Capital Member"}</Heading>
           <Text color="gray">{shortenAddress(address)}</Text>
@@ -147,17 +115,20 @@ export function ProfileSection({ address }: Props) {
       </Flex>
 
       <Box mt="20px">
-  <EmbeddedWallet />
-</Box>
+        <EmbeddedWallet />
+      </Box>
 
       {/* Profile Menu */}
-      <ProfileMenu selectedCollection={selectedCollection} setSelectedCollection={setSelectedCollection} />
+      <ProfileMenu
+        selectedCollection={selectedCollection}
+        setSelectedCollection={setSelectedCollection}
+      />
 
       {/* NFT Tabs */}
-      <Tabs variant="soft-rounded" onChange={(index) => setTabIndex(index)} isLazy defaultIndex={0} mt="20px">
+      <Tabs variant="soft-rounded" isLazy defaultIndex={0} mt="20px">
         <TabList>
           <Tab>Owned ({ownedNFTs?.length ?? 0})</Tab>
-          <Tab>Listings ({listings.length})</Tab>
+          <Tab>Listings ({listings?.length ?? 0})</Tab>
         </TabList>
 
         <TabPanels>
@@ -167,7 +138,8 @@ export function ProfileSection({ address }: Props) {
               <Text>Loading...</Text>
             ) : (
               <UnifiedNFTGallery
-                ownedNFTs={ownedNFTs ?? []}
+                ownedNFTs={ownedNFTs ?? []} // ✅ Only show owned NFTs
+                listings={[]} // ✅ No listings in this tab
                 refetchOwnedNFTs={refetchOwnedNFTs}
                 refetchStakedInfo={refetchStakedInfo}
                 chainId={selectedCollection.chain.id.toString()}
@@ -176,19 +148,17 @@ export function ProfileSection({ address }: Props) {
             )}
           </TabPanel>
 
-         
-
           {/* Listings */}
           <TabPanel>
             {listings.length > 0 ? (
-              listings.map((item, index) => (
-                <Box key={index} border="1px solid white" p="4px">
-                  <Link href={`/collection/${contract.chain.id}/${contract.address}/token/${item.asset.id.toString()}`} color="white">
-                    <Text>{item.asset.metadata.name ?? "Unnamed NFT"}</Text>
-                    <Text>Price: {toEther(item.pricePerToken)}</Text>
-                  </Link>
-                </Box>
-              ))
+              <UnifiedNFTGallery
+                ownedNFTs={[]} // ✅ No owned NFTs in the Listings tab
+                listings={listings ?? []} // ✅ Only show listed NFTs
+                refetchOwnedNFTs={refetchOwnedNFTs}
+                refetchStakedInfo={refetchStakedInfo}
+                chainId={selectedCollection.chain.id.toString()}
+                contractAddress={selectedCollection.address}
+              />
             ) : (
               <Text>No listings available.</Text>
             )}
