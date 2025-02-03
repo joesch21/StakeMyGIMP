@@ -78,6 +78,19 @@ export function Navbar() {
               </Button>
             </Link>
 
+            {/* "See My NFTs" Button placed between "Go Back" and "Buy GCC Tokens" */}
+            <Link href="https://gcc-staking.vercel.app/">
+              <Button
+                size="md"
+                bgGradient="linear(to-r,rgb(40, 183, 202),rgb(41, 139, 78))"
+                color="white"
+                fontWeight="bold"
+                _hover={{ bgGradient: "linear(to-l, #7928CA, #FF0080)" }}
+              >
+                Stake My NFT
+              </Button>
+            </Link>
+
             {/* Buy GCC Tokens Button */}
             <Link href="/purchase">
               <Button size="md" bg="yellow.400" color="black" _hover={{ bg: "yellow.500" }}>

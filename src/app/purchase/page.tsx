@@ -149,6 +149,30 @@ const PurchaseGCC: React.FC = () => {
           </Button>
         </Link>
       </Box>
+      <Box
+        borderRadius="12px"
+        padding="10px"
+        boxShadow="lg"
+        bg="whiteAlpha.200"
+        textAlign="center"
+        mb="20px"
+      >
+        <Link
+          href="https://gcc-staking.vercel.app/" // Replace with the correct Gold Condor Capital URL
+          isExternal
+        >
+          <Button
+            size="lg"
+            colorScheme="teal"
+            fontWeight="bold"
+            bg="green.400"
+            color="white"
+            _hover={{ bg: "green.500" }}
+          >
+            Stake Your NFT!
+          </Button>
+        </Link>
+      </Box>
 
       {/* Mobile Optimization Explanation */}
       <Box
