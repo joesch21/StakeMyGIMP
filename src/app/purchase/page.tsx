@@ -134,7 +134,7 @@ const PurchaseGCC: React.FC = () => {
         mb="20px"
       >
         <Link
-          href="https://www.gcc-bsc.online/main.html" // Replace with the correct Gold Condor Capital URL
+          href="https://www.gcc-bsc.online" // Replace with the correct Gold Condor Capital URL
           isExternal
         >
           <Button
@@ -158,7 +158,7 @@ const PurchaseGCC: React.FC = () => {
         mb="20px"
       >
         <Link
-          href="https://gcc-staking.vercel.app/" // Replace with the correct Gold Condor Capital URL
+          href="https://nft-staking-3esn.onrender.com/" // Replace with the correct Gold Condor Capital URL
           isExternal
         >
           <Button
